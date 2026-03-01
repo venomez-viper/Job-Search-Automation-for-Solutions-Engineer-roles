@@ -3,14 +3,15 @@ name: Daily Job Hunt
 on:
   schedule:
     # 8:00 AM Central Time = 14:00 UTC (winter/CST) / 13:00 UTC (summer/CDT)
-    # Using 14:00 UTC to reliably cover CST (UTC-6). Adjust to 13:00 for CDT.
     - cron: '0 14 * * *'
-  workflow_dispatch:   # also allows manual trigger from GitHub Actions tab
+  workflow_dispatch:   # allows manual trigger from Actions tab
 
 jobs:
   run-job-hunt:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write   # needed to commit jobs_log.csv back to the repo
 
     steps:
       - name: Checkout repository
@@ -33,13 +34,12 @@ jobs:
         run: pip install -r requirements.txt
 
       # ── Restore seen_jobs.db from previous run ──────────────────────────
-      # GitHub Actions has no persistent disk, so we store the DB as an artifact.
       - name: Download seen_jobs DB (if exists)
         uses: dawidd6/action-download-artifact@v3
         with:
           name: seen-jobs-db
           path: .
-          if_no_artifact_found: warn   # First run: no artifact yet, that's OK
+          if_no_artifact_found: warn
         continue-on-error: true
 
       - name: Run job hunt
@@ -47,14 +47,22 @@ jobs:
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
-          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
-          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
         run: python main.py
 
-      # ── Upload seen_jobs.db so next run can download it ─────────────────
+      # ── Commit jobs_log.csv back to repo (online log) ───────────────────
+      - name: Commit updated jobs log
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add jobs_log.csv || true
+          git diff --staged --quiet || git commit -m "chore: update jobs log [skip ci]"
+          git push
+        continue-on-error: true   # don't fail the run if nothing changed
+
+      # ── Persist seen_jobs.db for next run ───────────────────────────────
       - name: Upload seen_jobs DB
         uses: actions/upload-artifact@v4
-        if: always()   # upload even if the run partially failed
+        if: always()
         with:
           name: seen-jobs-db
           path: seen_jobs.db

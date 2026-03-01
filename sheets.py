@@ -1,69 +1,72 @@
 """
-sheets.py — Log daily job results to a Google Sheet.
+sheets.py — Log daily job results to jobs_log.csv in the repository.
+
+The CSV file accumulates every day and is committed back to GitHub
+by the Actions workflow, making it accessible online at any time.
+No Google credentials or external services required.
 """
-import os
-import json
+import csv
 import logging
 from datetime import datetime
+from pathlib import Path
 from fetchers.base import Job
 
 logger = logging.getLogger(__name__)
 
+CSV_FILE = "jobs_log.csv"
+HEADERS = ["Date", "Company", "Title", "Location", "URL", "Score", "Label", "Source", "Posted", "Match Signals"]
+
 
 def log_to_sheets(jobs: list[Job], dry_run: bool = False) -> bool:
     """
-    Append job rows to the configured Google Sheet.
-    Each row: [Date, Company, Title, Location, URL, Score, Source]
-    Returns True on success, False otherwise.
+    Append job rows to jobs_log.csv.
+    Creates the file with a header row if it doesn't exist yet.
+    Returns True on success, False on error.
     """
     if dry_run:
-        logger.info("DRY RUN — skipping Google Sheets log.")
+        logger.info("DRY RUN — skipping CSV log.")
         return True
-
-    sheet_id = os.environ.get("GOOGLE_SHEET_ID", "")
-    creds_json_str = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")
-
-    if not sheet_id or not creds_json_str:
-        logger.warning("GOOGLE_SHEET_ID / GOOGLE_CREDENTIALS_JSON not set. Skipping Sheets log.")
-        return False
 
     try:
-        import gspread
-        from google.oauth2.service_account import Credentials
-
-        creds_dict = json.loads(creds_json_str)
-        scopes = [
-            "https://www.googleapis.com/auth/spreadsheets",
-            "https://www.googleapis.com/auth/drive",
-        ]
-        creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
-        client = gspread.authorize(creds)
-
-        sheet = client.open_by_key(sheet_id)
-
-        # Use first worksheet, or create "Jobs" tab
-        try:
-            ws = sheet.worksheet("Jobs")
-        except Exception:
-            ws = sheet.add_worksheet(title="Jobs", rows=5000, cols=10)
-            # Add header row
-            ws.append_row(
-                ["Date", "Company", "Title", "Location", "URL", "Score", "Source"],
-                value_input_option="USER_ENTERED",
-            )
-
+        path = Path(CSV_FILE)
         today = datetime.now().strftime("%Y-%m-%d")
-        rows = [
-            [today, job.company, job.title, job.location, job.url, job.score, job.source]
-            for job in jobs
-        ]
-        ws.append_rows(rows, value_input_option="USER_ENTERED")
-        logger.info(f"Sheets: logged {len(jobs)} rows to Google Sheet '{sheet_id}'.")
+        write_header = not path.exists()
+
+        with open(path, "a", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+
+            if write_header:
+                writer.writerow(HEADERS)
+
+            for job in jobs:
+                bd = getattr(job, "breakdown", None)
+                signals = ""
+                if bd:
+                    parts = []
+                    if bd.core_matches:
+                        parts.append("Core: " + ", ".join(m.split("(")[0] for m in bd.core_matches[:3]))
+                    if bd.tool_matches:
+                        parts.append("Tools: " + ", ".join(m.split("(")[0] for m in bd.tool_matches[:2]))
+                    if bd.transferable_matches:
+                        parts.append("Transfer: " + ", ".join(m.split("->")[0] for m in bd.transferable_matches[:2]))
+                    signals = " | ".join(parts)
+
+                writer.writerow([
+                    today,
+                    job.company,
+                    job.title,
+                    job.location,
+                    job.url,
+                    job.score,
+                    getattr(job, "label", ""),
+                    job.source,
+                    job.date_posted or "",
+                    signals,
+                ])
+
+        logger.info(f"CSV: logged {len(jobs)} rows to {CSV_FILE}.")
         return True
 
-    except ImportError:
-        logger.error("gspread / google-auth not installed. Run: pip install gspread google-auth")
-        return False
     except Exception as e:
-        logger.error(f"Sheets log failed: {e}")
+        logger.error(f"CSV log failed: {e}")
         return False
