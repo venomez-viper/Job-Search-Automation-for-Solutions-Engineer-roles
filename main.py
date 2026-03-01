@@ -18,6 +18,9 @@ from fetchers.greenhouse import fetch_greenhouse
 from fetchers.lever import fetch_lever
 from fetchers.ashby import fetch_ashby
 from fetchers.workable import fetch_workable
+from fetchers.remotive import fetch_remotive
+from fetchers.themuse import fetch_themuse
+from fetchers.jsearch import fetch_jsearch
 from scorer import score_all
 from deduper import filter_new_jobs, mark_seen, get_seen_count
 from notifier import send_email
@@ -67,6 +70,9 @@ def run(dry_run: bool = False) -> None:
         ("Lever",      fetch_lever),
         ("Ashby",      fetch_ashby),
         ("Workable",   fetch_workable),
+        ("Remotive",   fetch_remotive),
+        ("The Muse",   fetch_themuse),
+        ("JSearch",    fetch_jsearch),
     ]:
         try:
             jobs = fetcher_fn()
