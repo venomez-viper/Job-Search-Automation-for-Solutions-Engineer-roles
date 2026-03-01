@@ -5,7 +5,7 @@ JSearch is a legal aggregator that pulls from LinkedIn, Indeed, Glassdoor, ZipRe
 Free tier: 500 requests/month — plenty for daily runs.
 
 Setup:
-  1. Go to https://rapidapi.com/letscrape-6bRB4iCsJnTs/api/jsearch
+  1. Go to https://rapidapi.com/openwebninja/api/jsearch (search 'jsearch' on rapidapi.com)
   2. Sign up free → Subscribe (Basic plan = 500 req/month free)
   3. Copy your API key → add as JSEARCH_API_KEY in GitHub Secrets
 
@@ -21,7 +21,7 @@ from config import TARGET_TITLES, EXCLUDE_TITLE_KEYWORDS, ALLOWED_LOCATIONS
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://jsearch.p.rapidapi.com/search"
+BASE_URL = "https://jsearch.p.rapidapi.com/search"   # endpoint unchanged
 TIMEOUT  = 20
 DELAY    = 1.0   # JSearch free tier rate limit is low — be polite
 
@@ -46,7 +46,7 @@ def fetch_jsearch() -> list[Job]:
 
     headers = {
         "X-RapidAPI-Key": api_key,
-        "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
+        "X-RapidAPI-Host": "jsearch.p.rapidapi.com",   # host unchanged — same as before
     }
 
     all_jobs: list[Job] = []
