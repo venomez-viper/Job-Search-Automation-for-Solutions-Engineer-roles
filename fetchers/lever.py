@@ -3,7 +3,13 @@ fetchers/lever.py — Fetch jobs from Lever public postings API.
 
 Public endpoint (no auth required):
   GET https://api.lever.co/v0/postings/{company}?mode=json
+
+Fixes:
+  - 20s timeout (was 10s — caused timeouts on slow companies)
+  - 0.3s delay between requests to avoid rate limiting
+  - Smarter 404/410 detection skips bad slugs silently
 """
+import time
 import requests
 import logging
 from datetime import datetime
@@ -14,6 +20,8 @@ from config import TARGET_TITLES, EXCLUDE_TITLE_KEYWORDS, ALLOWED_LOCATIONS, LEV
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://api.lever.co/v0/postings/{slug}?mode=json"
+TIMEOUT = 20       # seconds per request
+DELAY   = 0.3      # seconds between requests (avoid rate limits)
 
 
 def fetch_lever() -> list[Job]:
@@ -23,17 +31,28 @@ def fetch_lever() -> list[Job]:
     for slug in LEVER_COMPANIES:
         try:
             url = BASE_URL.format(slug=slug)
-            resp = requests.get(url, timeout=10)
-            if resp.status_code in (404, 403):
-                logger.debug(f"Lever: {slug} not found, skipping.")
+            resp = requests.get(url, timeout=TIMEOUT)
+            if resp.status_code in (404, 403, 410, 422):
+                logger.debug(f"Lever: {slug} not found ({resp.status_code}), skipping.")
+                time.sleep(DELAY)
                 continue
+            if resp.status_code == 429:
+                logger.warning(f"Lever: rate limited on {slug}, waiting 5s...")
+                time.sleep(5)
+                resp = requests.get(url, timeout=TIMEOUT)
             resp.raise_for_status()
             postings = resp.json()
+        except requests.exceptions.Timeout:
+            logger.warning(f"Lever: {slug} timed out after {TIMEOUT}s, skipping.")
+            time.sleep(DELAY)
+            continue
         except Exception as e:
             logger.warning(f"Lever fetch failed for {slug}: {e}")
+            time.sleep(DELAY)
             continue
 
         if not isinstance(postings, list):
+            time.sleep(DELAY)
             continue
 
         for post in postings:
@@ -42,7 +61,7 @@ def fetch_lever() -> list[Job]:
             location = categories.get("location", "") or post.get("workplaceType", "")
             job_url = post.get("hostedUrl", "")
 
-            # Description from lists
+            # Build description from structured sections
             lists_data = post.get("lists", []) or []
             description_parts = []
             for lst in lists_data:
@@ -73,6 +92,8 @@ def fetch_lever() -> list[Job]:
                 date_posted=date_posted,
                 source="lever",
             ))
+
+        time.sleep(DELAY)
 
     logger.info(f"Lever: found {len(all_jobs)} matching jobs.")
     return all_jobs
