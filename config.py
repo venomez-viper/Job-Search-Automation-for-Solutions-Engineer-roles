@@ -349,84 +349,117 @@ MAX_STRETCH = 5            # up to 5 Stretch but Apply jobs
 SCHEDULE_HOUR_UTC = 14    # 8 AM Central Time (UTC-6 in winter / UTC-5 summer)
 
 # ─── Company Lists by ATS ────────────────────────────────────────────────────
-# Add or remove companies freely. These are companies known to hire SE/PreSales roles.
+# Ratio: ~80% startups / Series A-C SaaS, ~20% mid-size known names.
+# Large enterprises (Salesforce, Zendesk, Cloudflare, Okta, etc.) removed.
 
 GREENHOUSE_COMPANIES = [
-    "figma", "notion", "airtable", "stripe", "brex", "rippling",
-    "lattice", "ramp", "gusto", "retool", "mixpanel", "amplitude",
-    "segment", "cockroachdb", "dbt-labs", "fivetran", "airbyte",
-    "census", "hightouch", "hex", "mode", "sigma", "thoughtspot",
-    "collibra", "alation", "atlan", "monte-carlo", "anomalo",
-    "clarifai", "cohere", "scale-ai", "weights-biases",
-    "postman", "stoplight", "readme", "apideck",
-    "salesforce", "mulesoft", "boomi", "snaplogic", "tray",
-    "workato", "zapier", "celigo", "cyclr",
-    "snowflake", "databricks", "starburst", "imply",
-    "looker", "sisense", "domo", "qlik", "microstrategy",
-    "intercom", "zendesk", "freshworks", "kustomer",
-    "medallia", "qualtrics", "sprinklr",
-    "hubspot", "salesloft", "outreach", "clari", "gong",
-    "pendo", "fullstory", "heap", "logrocket",
-    "samsara", "fleetio", "platform-science",
-    "cloudflare", "fastly", "akamai-technologies",
-    "hashicorp", "pulumi", "env0", "spacelift",
-    "grafana", "datadog", "newrelic", "dynatrace", "honeycomb",
-    "lacework", "orca-security", "wiz", "snyk", "veracode",
+    # Data / Analytics startups
+    "hex", "mode", "sigma", "lightdash", "metabase", "preset",
+    "cube", "atlan", "monte-carlo", "anomalo", "datafold",
+    "hightouch", "census", "polytomic", "segment",
+    "airbyte", "fivetran", "dbt-labs", "y42",
+    # Integration / API startups
+    "tray", "celigo", "cyclr", "alloy-automation", "parabola",
+    "apideck", "merge", "vessel", "postman", "readme",
+    # RevOps / Sales SaaS (Series A-C)
+    "clari", "gong", "avoma", "grain", "salesloft", "outreach",
+    "apollo", "pocus", "madkudu", "common-room",
+    "klue", "crayon", "kompyte",
+    # Customer success startups
+    "gainsight", "totango", "churnzero", "vitally",
+    "catalyst", "planhat", "userpilot", "appcues",
+    # Product analytics
+    "mixpanel", "amplitude", "heap", "pendo", "fullstory",
+    "logrocket", "sprig",
+    # Infrastructure / DevTools (startup-scale)
+    "retool", "airplane", "appsmith", "dagster", "prefect",
+    "hashicorp", "pulumi", "env0", "grafana", "honeycomb",
+    # Fintech / Ops SaaS
+    "ramp", "brex", "airbase", "rippling", "gusto", "lattice",
+    # Mid-size (kept for good SE culture)
+    "notion", "airtable", "figma", "miro",
+    "intercom", "freshworks", "kustomer", "hubspot",
 ]
 
 LEVER_COMPANIES = [
-    "scale-ai", "census", "hightouch", "metabase", "preset",
-    "fivetran", "stitch", "talend", "informatica", "matillion",
-    "dbt-labs", "transform", "lightdash", "cube",
-    "alloy-automation", "workato", "tray-io", "parabola",
-    "segment", "rudderstack", "mparticle",
-    "chartio", "klipfolio", "geckoboard",
-    "gainsight", "totango", "churnzero", "clientsuccess",
-    "jira-align", "planview", "targetprocess",
-    "miro", "lucidchart", "creatio",
-    "outreach", "salesloft", "groove", "yesware",
-    "zuora", "chargebee", "maxio", "recurly",
-    "chargify", "paddle", "fastspring",
-    "cloudinary", "imgix", "uploadcare",
-    "auth0", "okta", "onelogin", "ping-identity",
-    "crowdstrike", "sentinelone", "darktrace",
-    "algolia", "elasticsearch", "coveo",
-    "contentful", "sanity", "storyblok", "prismic",
-    "netlify", "vercel", "render", "railway",
-    "lob", "smarty-streets", "stannp",
-    "twilio", "bandwidth", "vonage", "sinch",
+    # Data / BI startups
+    "metabase", "lightdash", "evidence", "klipfolio", "geckoboard",
+    "rudderstack", "mparticle", "customerio",
+    "matillion", "hevo-data",
+    # Integration / automation startups
+    "workato", "tray-io", "parabola", "alloy-automation",
+    "merge-dev", "apideck", "nango",
+    # RevOps / sales intelligence startups
+    "salesloft", "outreach", "groove", "apollo",
+    "clari", "boostup", "revenue-grid",
+    # Billing / subscription SaaS
+    "chargebee", "maxio", "recurly", "paddle", "zuora",
+    # Customer success startups
+    "gainsight", "totango", "churnzero", "vitally",
+    "catalyst", "planhat", "clientsuccess",
+    # Collaboration / productivity
+    "miro", "lucidchart", "whimsical", "fibery",
+    "coda", "loom", "descript",
+    # API / Dev-focused SaaS
+    "algolia", "coveo", "twilio", "vonage", "sinch",
+    "cloudinary",
+    # Security / compliance startups
+    "drata", "vanta", "secureframe", "laika",
+    # Content / CMS SaaS
+    "contentful", "sanity", "storyblok",
+    "netlify", "vercel", "render",
 ]
 
 ASHBY_COMPANIES = [
-    "ashby", "ramp", "brex", "mercury", "column-tax",
-    "watershed", "pachama", "terraformation",
+    # Fintech / banking SaaS
+    "ramp", "brex", "mercury", "modern-treasury", "increase",
+    "column", "unit", "treasury-prime",
+    # Compliance / trust SaaS
     "drata", "vanta", "secureframe", "laika",
-    "persona", "sardine", "unit21", "sift",
-    "modern-treasury", "increase", "column",
-    "benchling", "synthego", "ginkgo-bioworks",
-    "scale-ai", "cohere", "adept", "inflection",
-    "robinhood", "coinbase", "gemini", "kraken",
-    "instabase", "ironclad", "spotdraft", "leigalaw",
-    "mural", "stormboard", "klaxoon",
-    "productboard", "coda", "craft", "fibery",
-    "linear", "height", "plane",
-    "loom", "mmhmm", "descript",
+    "conveyor", "whistic", "anecdotes",
+    # Identity / fraud prevention
+    "persona", "sardine", "unit21", "sift", "socure",
+    # Data startups
+    "hex", "lightdash", "hightouch", "census", "datafold",
+    # AI / ML platforms (startup-scale)
+    "cohere", "together-ai", "weights-biases",
+    "arize-ai", "fiddler", "superwise",
+    # Legal / contract tech
+    "ironclad", "spotdraft", "instabase", "lexion",
+    # HR / workforce SaaS
     "deel", "remote", "papaya-global", "oyster",
+    "rippling", "lattice", "leapsome",
+    # Collaboration / product tools
+    "linear", "height", "shortcut",
+    "productboard", "coda", "fibery", "loom", "descript",
+    # Climate / vertical SaaS
+    "watershed", "pachama", "arcadia",
+    # Recruiting / HR tech startups
+    "ashby", "dover", "gem",
 ]
 
 WORKABLE_COMPANIES = [
-    "workable", "bamboohr", "namely", "hibob", "personio",
-    "lattice", "culture-amp", "leapsome", "betterworks",
-    "mimecast", "proofpoint", "barracuda",
-    "freshdesk", "kayako", "helpscout", "groove",
-    "mailchimp", "klaviyo", "attentive", "sms-magic",
-    "semrush", "moz", "ahrefs", "majestic",
-    "hotjar", "crazy-egg", "mouseflow", "contentsquare",
-    "podium", "birdeye", "reputation", "grade-us",
-    "brightcove", "vidyard", "wistia", "vimeo",
-    "docusign", "hellosign", "pandadoc", "proposify",
-    "boldsign", "signnow", "signwell",
-    "xero", "freshbooks", "wave", "kashoo",
-    "coupa", "tipalti", "bill", "airbase",
-    "brainware", "esker", "readsoft", "kofax",
+    # HR / people ops SaaS
+    "bamboohr", "hibob", "personio", "namely",
+    "culture-amp", "leapsome", "betterworks",
+    "15five", "engagedly", "trakstar",
+    # Marketing / growth SaaS
+    "klaviyo", "attentive", "postscript", "drip",
+    "customerio", "braze", "iterable",
+    "semrush", "ahrefs",
+    # Customer experience
+    "podium", "birdeye", "grade-us",
+    "yotpo", "okendo",
+    # Video / content SaaS
+    "vidyard", "wistia", "loom",
+    # Document / eSign SaaS
+    "pandadoc", "proposify", "hellosign", "boldsign",
+    # Finance / spend management
+    "airbase", "spendesk", "pleo", "bill",
+    # Analytics / data SaaS
+    "hotjar", "mouseflow", "contentsquare",
+    # Vertical SaaS
+    "fleetio", "samsara",
+    "helpscout", "groove",
 ]
+
