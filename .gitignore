@@ -1,0 +1,13 @@
+# Git ignore — secrets and generated files
+.env
+seen_jobs.db
+job_hunt.log
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.DS_Store
+Thumbs.db
