@@ -29,6 +29,7 @@ from scorer import score_all
 from deduper import filter_new_jobs, mark_seen, get_seen_count
 from notifier import send_email
 from sheets import log_to_sheets
+from onedrive import log_to_onedrive
 from config import (
     MIN_JOBS_PER_RUN,
     MAX_JOBS_PER_RUN,
@@ -122,10 +123,13 @@ def run(dry_run: bool = False) -> None:
         logger.warning("No new jobs today. Exiting.")
         return
 
-    # ── 6. Log to Google Sheets ───────────────────────────────────────────
+    # ── 6. Log to CSV (committed to GitHub repo) ─────────────────────────
     log_to_sheets(top_jobs, dry_run=dry_run)
 
-    # ── 7. Send email digest ──────────────────────────────────────────────
+    # ── 7. Log to OneDrive Excel ──────────────────────────────────────────
+    log_to_onedrive(top_jobs, dry_run=dry_run)
+
+    # ── 8. Send email digest ──────────────────────────────────────────────
     send_email(top_jobs, dry_run=dry_run)
 
     # ── 8. Mark as seen ───────────────────────────────────────────────────

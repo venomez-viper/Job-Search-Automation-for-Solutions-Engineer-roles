@@ -50,6 +50,10 @@ jobs:
           JSEARCH_API_KEY: ${{ secrets.JSEARCH_API_KEY }}
           ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
           ADZUNA_API_KEY: ${{ secrets.ADZUNA_API_KEY }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ONEDRIVE_FILE_PATH: ${{ secrets.ONEDRIVE_FILE_PATH }}
         run: python main.py
 
       # ── Commit jobs_log.csv back to repo (online log) ───────────────────
