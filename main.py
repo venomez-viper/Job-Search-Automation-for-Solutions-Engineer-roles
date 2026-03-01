@@ -21,6 +21,10 @@ from fetchers.workable import fetch_workable
 from fetchers.remotive import fetch_remotive
 from fetchers.themuse import fetch_themuse
 from fetchers.jsearch import fetch_jsearch
+from fetchers.ycombinator import fetch_ycombinator
+from fetchers.himalayas import fetch_himalayas
+from fetchers.adzuna import fetch_adzuna
+from fetchers.hackernews import fetch_hackernews
 from scorer import score_all
 from deduper import filter_new_jobs, mark_seen, get_seen_count
 from notifier import send_email
@@ -66,13 +70,17 @@ def run(dry_run: bool = False) -> None:
     # ── 1. Fetch ──────────────────────────────────────────────────────────
     all_jobs = []
     for fetcher_name, fetcher_fn in [
-        ("Greenhouse", fetch_greenhouse),
-        ("Lever",      fetch_lever),
-        ("Ashby",      fetch_ashby),
-        ("Workable",   fetch_workable),
-        ("Remotive",   fetch_remotive),
-        ("The Muse",   fetch_themuse),
-        ("JSearch",    fetch_jsearch),
+        ("Greenhouse",   fetch_greenhouse),
+        ("Lever",        fetch_lever),
+        ("Ashby",        fetch_ashby),
+        ("Workable",     fetch_workable),
+        ("Remotive",     fetch_remotive),
+        ("The Muse",     fetch_themuse),
+        ("JSearch",      fetch_jsearch),
+        ("YCombinator",  fetch_ycombinator),
+        ("Himalayas",    fetch_himalayas),
+        ("Adzuna",       fetch_adzuna),
+        ("HackerNews",   fetch_hackernews),
     ]:
         try:
             jobs = fetcher_fn()
