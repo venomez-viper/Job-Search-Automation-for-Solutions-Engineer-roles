@@ -40,6 +40,8 @@ from config import (
     RAMP_FEASIBILITY_BOOST,
     HARD_BLOCKER_KEYWORDS,
     HARD_BLOCKER_PENALTY,
+    E_VERIFY_KEYWORDS,
+    E_VERIFY_BOOST,
     SCORING_WEIGHTS,
     HIGH_MATCH_CORE_THRESHOLD,
     STRETCH_CORE_THRESHOLD,
@@ -69,6 +71,7 @@ class ScoreBreakdown:
     location_score: int = 0
     freshness_score: int = 0
     ramp_boost: int = 0
+    e_verify_boost: int = 0
     hard_blocker_penalty: int = 0
     unrelated_penalty: int = 0
     total: int = 0
@@ -229,6 +232,15 @@ def _score_ramp(description: str) -> tuple[int, list[str]]:
     return 0, []
 
 
+def _score_e_verify(description: str) -> int:
+    """Boost if job explicitly signals E-Verify participation or visa sponsorship."""
+    desc_lower = description.lower()
+    for kw in E_VERIFY_KEYWORDS:
+        if kw in desc_lower:
+            return E_VERIFY_BOOST
+    return 0
+
+
 def _score_hard_blockers(description: str) -> tuple[int, list[str]]:
     """Large penalty for hard disqualifiers (clearances, unreachable certifications)."""
     desc_lower = description.lower()
@@ -296,7 +308,10 @@ def score_job(job: Job) -> tuple[int, ScoreBreakdown]:
     # Component 7 — Ramp feasibility boost (stretch-role friendly)
     bd.ramp_boost, bd.ramp_keywords_found = _score_ramp(job.description)
 
-    # Component 8 — Hard blockers
+    # Component 8 — E-Verify / sponsorship-friendly signal
+    bd.e_verify_boost = _score_e_verify(job.description)
+
+    # Component 9 — Hard blockers
     bd.hard_blocker_penalty, bd.hard_blockers_found = _score_hard_blockers(job.description)
 
     # Component 9 — Clearly unrelated domain
@@ -312,6 +327,7 @@ def score_job(job: Job) -> tuple[int, ScoreBreakdown]:
         + bd.location_score
         + bd.freshness_score
         + bd.ramp_boost
+        + bd.e_verify_boost
         + bd.hard_blocker_penalty
         + bd.unrelated_penalty,
         0,

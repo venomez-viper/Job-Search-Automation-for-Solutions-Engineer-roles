@@ -304,24 +304,57 @@ RAMP_FEASIBILITY_BOOST = 4   # points added if ≥1 ramp keyword found
 
 # ─── Hard Blocker Keywords ────────────────────────────────────────────────────
 # These cause a large penalty because the role has a disqualifying requirement.
+# IMPORTANT: Sponsorship-denial phrases are critical — these filter out roles
+# that require permanent US work authorization (green card / citizenship).
 HARD_BLOCKER_PENALTY = -25
 HARD_BLOCKER_KEYWORDS = [
+    # Work authorization blockers (OPT/visa-hostile)
+    "sponsorship not available",
+    "unable to sponsor",
+    "will not sponsor",
+    "cannot sponsor",
+    "no visa sponsorship",
+    "does not offer sponsorship",
+    "must be permanently authorized",
+    "must be authorized to work permanently",
+    "green card required",
+    "must be a us citizen or permanent resident",
+    "us citizen or permanent resident only",
+    "permanent work authorization required",
+    # Security clearance (government/defense roles)
     "security clearance",
     "secret clearance",
     "top secret",
     "ts/sci",
     "active clearance",
     "dod clearance",
-    "must be a us citizen",       # combined with clearance reqs
+    "must be a us citizen",
     "must have clearance",
+    # Credential hard requirements
     "cissp required",
     "cpa required",
     "bar exam",
     "md required",
     "phd required",
+    # Experience hard requirements
     "10+ years",
-    "15+ years",
     "12+ years",
+    "15+ years",
+]
+
+# ─── E-Verify / Sponsorship-Friendly Boost ───────────────────────────────────
+# Small boost for jobs that explicitly signal OPT/visa friendliness.
+E_VERIFY_BOOST = 5
+E_VERIFY_KEYWORDS = [
+    "e-verify",
+    "e verify",
+    "visa sponsorship available",
+    "sponsorship available",
+    "will sponsor",
+    "open to sponsorship",
+    "opt accepted",
+    "opt welcome",
+    "work authorization assistance",
 ]
 
 # ─── Classification Thresholds ────────────────────────────────────────────────
