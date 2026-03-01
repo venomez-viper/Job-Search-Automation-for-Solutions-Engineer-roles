@@ -1,5 +1,6 @@
 # Git ignore — secrets and generated files
 .env
+*.json
 seen_jobs.db
 job_hunt.log
 __pycache__/
