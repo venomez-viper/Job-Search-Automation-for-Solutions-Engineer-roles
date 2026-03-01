@@ -42,6 +42,7 @@ def fetch_ashby() -> list[Job]:
     for slug in ASHBY_COMPANIES:
         try:
             payload = {
+                "operationName": "jobPostings",
                 "query": QUERY,
                 "variables": {"companySlug": slug},
             }
